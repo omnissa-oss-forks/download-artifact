@@ -104,6 +104,11 @@ You are welcome to still raise bugs in this repo.
     # Can be one of: `ignore`, `info`, `warn`, `error`
     # Optional. Default is `error`
     digest-mismatch:
+
+    # Whether to emit a warning annotation when `pattern` matches no artifacts.
+    # If `false`, the message is logged at info level instead.
+    # Optional. Default is `true`
+    warn-on-no-match:
 ```
 
 ### Outputs

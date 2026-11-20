@@ -8,7 +8,8 @@ export enum Inputs {
   MergeMultiple = 'merge-multiple',
   ArtifactIds = 'artifact-ids',
   SkipDecompress = 'skip-decompress',
-  DigestMismatch = 'digest-mismatch'
+  DigestMismatch = 'digest-mismatch',
+  WarnOnNoMatch = 'warn-on-no-match'
 }
 
 export enum DigestMismatchBehavior {

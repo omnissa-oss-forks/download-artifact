@@ -129462,6 +129462,7 @@ var Inputs;
     Inputs["ArtifactIds"] = "artifact-ids";
     Inputs["SkipDecompress"] = "skip-decompress";
     Inputs["DigestMismatch"] = "digest-mismatch";
+    Inputs["WarnOnNoMatch"] = "warn-on-no-match";
 })(Inputs || (Inputs = {}));
 var DigestMismatchBehavior;
 (function (DigestMismatchBehavior) {
@@ -129602,7 +129603,10 @@ async function run() {
             required: false
         }),
         digestMismatch: (getInput(Inputs.DigestMismatch, { required: false }) ||
-            DigestMismatchBehavior.Error)
+            DigestMismatchBehavior.Error),
+        warnOnNoMatch: getBooleanInput(Inputs.WarnOnNoMatch, {
+            required: false
+        })
     };
     // Validate digest-mismatch input
     const validBehaviors = Object.values(DigestMismatchBehavior);
@@ -129703,7 +129707,13 @@ async function run() {
             });
             info(`Pattern '${inputs.pattern}' matched ${artifacts.length} of ${listArtifactResponse.artifacts.length} artifacts`);
             if (artifacts.length === 0) {
-                warning(`Pattern '${inputs.pattern}' matched no artifact names or uploaded file paths. Available paths: ${[...manifestPaths.values()].slice(0, 20).join(', ') || '(none)'}`);
+                const message = `Pattern '${inputs.pattern}' matched no artifact names or uploaded file paths. Available paths: ${[...manifestPaths.values()].slice(0, 20).join(', ') || '(none)'}`;
+                if (inputs.warnOnNoMatch) {
+                    warning(message);
+                }
+                else {
+                    info(message);
+                }
             }
         }
         else {

@@ -164,7 +164,10 @@ export async function run(): Promise<void> {
       required: false
     }),
     digestMismatch: (core.getInput(Inputs.DigestMismatch, {required: false}) ||
-      DigestMismatchBehavior.Error) as DigestMismatchBehavior
+      DigestMismatchBehavior.Error) as DigestMismatchBehavior,
+    warnOnNoMatch: core.getBooleanInput(Inputs.WarnOnNoMatch, {
+      required: false
+    })
   }
 
   // Validate digest-mismatch input
@@ -314,9 +317,12 @@ export async function run(): Promise<void> {
         `Pattern '${inputs.pattern}' matched ${artifacts.length} of ${listArtifactResponse.artifacts.length} artifacts`
       )
       if (artifacts.length === 0) {
-        core.warning(
-          `Pattern '${inputs.pattern}' matched no artifact names or uploaded file paths. Available paths: ${[...manifestPaths.values()].slice(0, 20).join(', ') || '(none)'}`
-        )
+        const message = `Pattern '${inputs.pattern}' matched no artifact names or uploaded file paths. Available paths: ${[...manifestPaths.values()].slice(0, 20).join(', ') || '(none)'}`
+        if (inputs.warnOnNoMatch) {
+          core.warning(message)
+        } else {
+          core.info(message)
+        }
       }
     } else {
       core.info(

@@ -46,6 +46,11 @@ inputs:
       Options: ignore, info, warn, error. Default is error which will fail the action.'
     required: false
     default: 'error'
+  warn-on-no-match:
+    description: 'If true, emit a warning annotation when `pattern` matches no artifacts.
+      If false, the message is logged at info level instead.'
+    required: false
+    default: 'true'
 outputs:
   download-path:
     description: 'Path of artifact download'

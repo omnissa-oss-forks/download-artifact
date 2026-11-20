@@ -65,6 +65,7 @@ const mockInputs = (
     [Inputs.Repository]: 'owner/some-repository',
     [Inputs.RunID]: 'some-run-id',
     [Inputs.Pattern]: 'some-pattern',
+    [Inputs.WarnOnNoMatch]: true,
     ...overrides
   }
 
@@ -302,6 +303,29 @@ describe('download', () => {
 
       expect(downloadedIds.filter(id => id !== 1).sort()).toEqual(ids)
     })
+
+    test.each([
+      [true, 'warning', 'info'],
+      [false, 'info', 'warning']
+    ] as const)(
+      'warn-on-no-match=%s logs a no-match pattern via core.%s',
+      async (warnOnNoMatch, used, unused) => {
+        setupRun([{id: 5, name: 'other'}], {5: 'O'})
+        mockInputs({
+          [Inputs.Name]: '',
+          [Inputs.Pattern]: 'nothing-matches',
+          [Inputs.Path]: dest,
+          [Inputs.WarnOnNoMatch]: warnOnNoMatch
+        })
+
+        await run()
+
+        const noMatch = expect.stringContaining('matched no artifact names')
+        expect(core[used]).toHaveBeenCalledWith(noMatch)
+        expect(core[unused]).not.toHaveBeenCalledWith(noMatch)
+        expect(downloadedIds).toEqual([])
+      }
+    )
 
     test('does not restore paths when downloading by name', async () => {
       setupRun([{id: 3, name: 'tests_b.txt'}], {3: 'B'})
